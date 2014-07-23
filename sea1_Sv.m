@@ -25,6 +25,7 @@ depth_m = mean(reshape(depth(1:maxN),ensemble_N,maxN/ensemble_N));
 depth_e = mean(reshape(edepth(1:maxN),ensemble_N,maxN/ensemble_N));
 
 %% º∆À„Sv--------------------------------------------------------%
+
 NSL = 31;
 W = 63e3;
 theta = 4/180*pi;
@@ -55,49 +56,29 @@ P = 10^(SL - DI - 170.8)/10;
 % Kc = 0.9;
 Con = 20;
 
-% theta = 4/180*pi;
-% solid_angle = 2*pi*(1-cos(theta/2));
-% layerH = 2;
-% Vrec = ((ADCPpara.ranges./10+layerH/2).^3 - (ADCPpara.ranges./10-layerH/2).^3)*solid_angle/3;
-% 
-% Vrec1 = layerH*solid_angle;
 
-Sv = zeros(size(avEI));
-for i = 1:floor(pN/avN)
-      Sv(i,:) = avEI(i,:) + 2*rw*depth' + 20*log10(depth') - 216 - 10*log10(Vrec1') - Con;
-%       Sv(i,:) = 0.9*(avEI(i,:) - NL) + 2*rw*depth' + 20*log10(depth') - 216  - 10*log10(Vrec1');
+depth_range = ADCPpara.ranges./10;
+distance = mean(reshape(distance(1:maxN),ensemble_N,maxN/ensemble_N));
+
+Sv = zeros(floor(pN/ensemble_N),size(avEI,2));
+for i = 1:floor(pN/ensemble_N)
+    Sv(i,:) = 0.45*(avEI(i,:) - NL) + 2*rw*depth_range' + 20*log10(depth_range') - 216;
 end
 
-% figure;
-% set(gca,'FontSize',14);
-% [X Y] = meshgrid(depth,(1:floor(pN/avN))*avN/2);
-% surf(X,Y,Sv,'LineStyle','none',...
-%     'FaceColor','interp',...
-%     'DisplayName','EI_effect');colorbar;view([90 90]);
-% xlabel('Depth(m)');ylabel('Time(s)');zlabel('S_v(dB ref 1uPa)');title('S_v(dB ref 1uPa)');
-% xlim([depth(1) depth(end)]);ylim([1 floor(pN/avN)]*avN/2);
+figure;
+set(gca,'FontSize',14);
 
-% figure
-% set(gca,'FontSize',14);
-% step = floor(pN/avN/4);
-% plot(ADCPpara.ranges./10,Sv(step*4,:),'linewidth',1,...
-%     'MarkerFaceColor',[0.16 0.38 0.27],'Marker','square','Color',[1 0 0]);hold on;
-% plot(ADCPpara.ranges./10,Sv(step*3,:),'linewidth',1,...
-%     'MarkerFaceColor',[1 1 0],'Marker','o','Color',[0 0 1]);hold on;
-% plot(ADCPpara.ranges./10,Sv(step*2,:),'linewidth',1,...
-%     'MarkerFaceColor',[0 0 1],'Marker','v','Color',[0 0 0]);hold on;
-% plot(ADCPpara.ranges./10,Sv(step*1,:),'linewidth',1,...
-%     'MarkerFaceColor',[1 0 0],'MarkerSize',10,'Marker','*',...
-%     'LineStyle','--','Color',[0.043 0.51 0.78]);hold off;
-% xlim([min(ADCPpara.ranges./10) max(ADCPpara.ranges./10)]);
-% xlabel('Depth(m)');ylabel('S_v(dB ref 1uPa)');
-% legend(['t = ' num2str(step*4*avN*2) 's'],...
-%        ['t = ' num2str(step*3*avN*2) 's'],...
-%        ['t = ' num2str(step*2*avN*2) 's'],...
-%        ['t = ' num2str(step*1*avN*2) 's'])
-% grid on;
+[X Y] = meshgrid(depth_range,distance);
+surf(X,Y,Sv,'LineStyle','none',...
+    'FaceColor','interp',...
+    'DisplayName','EI_effect');colorbar;view([90 90]);
 
+xlabel('Depth(m)');
+ylabel('Time(s)');
+zlabel('S_v(dB ref 1uPa)');
+title('S_v(dB ref 1uPa)');
 
-
+xlim([depth_range(1) depth_range(end)]);
+ylim([distance(1) distance(end)]);
 
 
