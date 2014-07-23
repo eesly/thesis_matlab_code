@@ -73,10 +73,20 @@ for i = 1:floor(pN/ensemble_N)
 %     Sv(i,:) = 0.45*(avEI(i,:) - NL) + 2*rw*depth_range' + 20*log10(depth_range') - 216;
 end
 
-%%无效区域去除
+%% Sv->SSC-------------------------------------------------------%
+fc = 300e3;
+band = 90e3;
+frange = [fc-band/2 fc fc+band/2];
+
+density = 2650;     %kg/m^3;
+as = 60e-6
+% SSC = 10.^(Sv/10)*100e5/2;
+SSC = (10.^(Sv./10))*3*density*ADCPpara.soundspeed.^4 /(as).^3/frange(2).^4/1.082/4/pi^3;
+
+%% 无效区域去除
 earea = floor(-depth_e/2);
 for i = 1:length(earea)
-    Sv(i,earea(i)+1:end) = 0;
+    SSC(i,earea(i):end) = 5;
 end
 
 %% figure
@@ -84,13 +94,13 @@ figure;
 set(gca,'FontSize',14);
 
 [X Y] = meshgrid(depth_range,distance);
-contourf(X,Y,Sv,'LevelStep',2,'LineStyle','-');
-% surf(X,Y,Sv,'LineStyle','none',...
+contourf(X,Y,SSC,'LevelStep',0.1,'LineStyle','-');
+% surf(X,Y,SSC,'LineStyle','none',...
 %     'FaceColor','interp',...
-%     'DisplayName','EI_effect');colorbar;view([90 90]);
+%     'DisplayName','EI_effect');
 hold on;
 colorbar;
-caxis([-85 -50]);
+caxis([0 2]);
 view([90 90]);
 
 % plot(-depth_m,distance,'+black','linewidth',3);hold on;
@@ -98,9 +108,27 @@ plot(-depth_e,distance,'*blue','linewidth',3);hold on;
 
 xlabel('深度(m)');
 ylabel('距离(m)');
-title('单位体积散射强度(dB ref 1uPa)')
+title('悬沙浓度()')
 
 xlim([depth_range(1) depth_range(end)]);
 ylim([distance(1) distance(end)]);
-
+% figure
+% set(gca,'FontSize',18);
+% step = floor(pN/avN/4);
+% plot(ADCPpara.ranges(1:26)./10,SSC(step*4,1:26),'linewidth',2,...
+%     'MarkerFaceColor',[0.16 0.38 0.27],'Marker','square','Color',[1 0 0]);hold on;
+% plot(ADCPpara.ranges(1:26)./10,SSC(step*3,1:26),'linewidth',2,...
+%     'MarkerFaceColor',[1 1 0],'Marker','o','Color',[0 0 1]);hold on;
+% plot(ADCPpara.ranges(1:29)./10,SSC(step*2,1:29),'linewidth',2,...
+%     'MarkerFaceColor',[0 0 1],'Marker','v','Color',[0 0 0]);hold on;
+% plot(ADCPpara.ranges(1:36)./10,SSC(step*1,1:36),'linewidth',2,...
+%     'MarkerFaceColor',[1 0 0],'MarkerSize',10,'Marker','*',...
+%     'LineStyle','--','Color',[0.043 0.51 0.78]);hold off;
+% xlim([min(ADCPpara.ranges./10) max(ADCPpara.ranges(1:36)./10)]);
+% xlabel('Depth(m)');ylabel('SSC(kg m^-3)');
+% legend(['t = ' num2str(step*4*avN*2) 's'],...
+%        ['t = ' num2str(step*3*avN*2) 's'],...
+%        ['t = ' num2str(step*2*avN*2) 's'],...
+%        ['t = ' num2str(step*1*avN*2) 's'])
+% grid on;
 
