@@ -1,13 +1,13 @@
 clear all;
 close all;
 clc;
-load('.\sea1_data\sea1_EI.mat');
-load('.\sea1_data\sea1_ADCPpara.mat')
-load('.\sea1_data\sea1_AD.mat')
-load('.\sea1_data\sea1_vz.mat');
-load('.\sea1_data\sea1_depth');
-load('.\sea1_data\sea1_edepth');
-load('.\sea1_data\sea1_distance');
+load('.\sea2_data\sea2_EI.mat');
+load('.\sea2_data\sea2_ADCPpara.mat')
+load('.\sea2_data\sea2_AD.mat')
+load('.\sea2_data\sea2_vz.mat');
+load('.\sea2_data\sea2_depth');
+load('.\sea2_data\sea2_edepth');
+load('.\sea2_data\sea2_distance');
 %% 平均EI--------------------------------------------------------%
 
 %EL
@@ -17,7 +17,8 @@ avEI = zeros(floor(pN/ensemble_N),dN);
 for i = 1:floor(pN/ensemble_N)
     avEI(i,:) = mean(EI1((i-1)*ensemble_N+1:i*ensemble_N,:));
 end
-avEI(avEI == Inf | avEI == -Inf) = 114;
+avEI(avEI == Inf | avEI == -Inf) = 115;
+ADCPpara.ranges = ADCPpara.ranges(1:47);
 ADCPpara.blinddepth = ADCPpara.ranges(1);
 
 %depth distance
@@ -86,7 +87,7 @@ SSC = (10.^(Sv./10))*3*density*ADCPpara.soundspeed.^4 /(as).^3/frange(2).^4/1.08
 %% 无效区域去除
 earea = floor(-depth_e/2);
 for i = 1:length(earea)
-    SSC(i,earea(i):end) = 5;
+    SSC(i,earea(i):end) = 1;
 end
 
 %% figure
@@ -94,13 +95,13 @@ figure;
 set(gca,'FontSize',14);
 
 [X Y] = meshgrid(depth_range,distance);
-contourf(X,Y,SSC,'LevelStep',0.1,'LineStyle','-');
+contourf(X,Y,SSC,'LevelStep',0.07,'LineStyle','-');
 % surf(X,Y,SSC,'LineStyle','none',...
 %     'FaceColor','interp',...
 %     'DisplayName','EI_effect');
 hold on;
 colorbar;
-caxis([0 2]);
+caxis([0 1]);
 view([90 90]);
 
 % plot(-depth_m,distance,'+black','linewidth',3);hold on;
@@ -110,7 +111,7 @@ xlabel('深度(m)');
 ylabel('距离(m)');
 title('悬沙浓度(kg/m^3)')
 
-xlim([depth_range(1) depth_range(end-10)]);
+xlim([depth_range(1) depth_range(end-20)]);
 ylim([distance(1) distance(end)]);
 %%
 step = floor(pN/ensemble_N/4);
@@ -118,32 +119,32 @@ step = floor(pN/ensemble_N/4);
 figure
 set(gca,'FontSize',14);
 
-plot(depth_range(1:26),SSC(step*4,1:26),...
+plot(depth_range(1:20),SSC(step*4,1:20),...
     'linewidth',2.5,...
     'MarkerFaceColor',[0.16 0.38 0.27],...
     'Marker','square',...
     'Color',[0.87058824300766 0.490196079015732 0]);hold on;
 
-plot(depth_range(1:26),SSC(step*3,1:26),...
+plot(depth_range(1:21),SSC(step*3,1:21),...
     'linewidth',2.5,...
     'MarkerFaceColor',[1 1 0],...
     'Marker','o',...
     'Color',[0.47843137383461 0.062745101749897 0.894117653369904]);hold on;
 
-plot(depth_range(1:29),SSC(step*2,1:29),'MarkerFaceColor',[0.847058832645416 0.160784319043159 0],...
+plot(depth_range(1:20),SSC(step*2,1:20),'MarkerFaceColor',[0.847058832645416 0.160784319043159 0],...
     'MarkerEdgeColor',[0.847058832645416 0.160784319043159 0],...
     'MarkerSize',8,...
     'Marker','v',...
     'LineWidth',2,...
     'Color',[0.0705882385373116 0.211764708161354 0.141176477074623]);hold on;
 
-plot(depth_range(1:35),SSC(step*1,1:35),'MarkerFaceColor',[1 0 0],'MarkerSize',4,...
+plot(depth_range(1:19),SSC(step*1,1:19),'MarkerFaceColor',[1 0 0],'MarkerSize',4,...
     'Marker','*',...
     'LineWidth',4,...
     'LineStyle','--',...
     'Color',[0.152941182255745 0.227450981736183 0.372549027204514]);hold off;
 
-xlim([min(depth_range) max(depth_range(1:36))]);
+xlim([min(depth_range) max(depth_range(1:21))]);
 
 xlabel('深度(m)');
 ylabel('悬沙浓度(kg m^-3)');
@@ -153,23 +154,5 @@ legend([num2str(floor(distance(step*4))) 'm'],...
        [num2str(floor(distance(step*1))) 'm'])
    
 grid on;
-% figure
-% set(gca,'FontSize',14);
-% step = floor(pN/ensemble_N/4);
-% plot(ADCPpara.ranges(1:26)./10,SSC(step*4,1:26),'linewidth',2,...
-%     'MarkerFaceColor',[0.16 0.38 0.27],'Marker','square','Color',[1 0 0]);hold on;
-% plot(ADCPpara.ranges(1:26)./10,SSC(step*3,1:26),'linewidth',2,...
-%     'MarkerFaceColor',[1 1 0],'Marker','o','Color',[0 0 1]);hold on;
-% plot(ADCPpara.ranges(1:29)./10,SSC(step*2,1:29),'linewidth',2,...
-%     'MarkerFaceColor',[0 0 1],'Marker','v','Color',[0 0 0]);hold on;
-% plot(ADCPpara.ranges(1:35)./10,SSC(step*1,1:35),'linewidth',2,...
-%     'MarkerFaceColor',[1 0 0],'MarkerSize',10,'Marker','*',...
-%     'LineStyle','--','Color',[0.043 0.51 0.78]);hold off;
-% xlim([min(ADCPpara.ranges./10) max(ADCPpara.ranges(1:36)./10)]);
-% xlabel('Depth(m)');ylabel('SSC(kg m^-3)');
-% legend(['t = ' num2str(step*4*ensemble_N*2) 's'],...
-%        ['t = ' num2str(step*3*ensemble_N*2) 's'],...
-%        ['t = ' num2str(step*2*ensemble_N*2) 's'],...
-%        ['t = ' num2str(step*1*ensemble_N*2) 's'])
-% grid on;
+
 
