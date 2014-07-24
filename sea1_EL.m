@@ -32,7 +32,7 @@ figure;
 set(gca,'FontSize',14);
 
 [X Y] = meshgrid(depth_range,distance);
-contourf(X,Y,avEI,'LevelStep',2,'LineStyle','-');
+contourf(X,Y,avEI,'LevelStep',1.5,'LineStyle','-');
 hold on;
 colorbar;
 view([90 90]);

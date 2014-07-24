@@ -42,7 +42,7 @@ NL = NSL + 10*log10(W) - DI;
 NL
 
 %rw
-T = 27.5;       %温度
+T = 20;          %温度
 S = 35;         %盐度35ppt
 Z = 0;          %深度0km
 PH = 8;
@@ -77,7 +77,7 @@ end
 %%无效区域去除
 earea = floor(-depth_e/2);
 for i = 1:length(earea)
-    Sv(i,earea(i)+1:end) = 0;
+    Sv(i,earea(i)+1:end) = -80;
 end
 
 %% figure
@@ -91,7 +91,7 @@ contourf(X,Y,Sv,'LevelStep',2,'LineStyle','-');
 %     'DisplayName','EI_effect');colorbar;view([90 90]);
 hold on;
 colorbar;
-caxis([-85 -50]);
+caxis([-80 -55]);
 view([90 90]);
 
 % plot(-depth_m,distance,'+black','linewidth',3);hold on;
@@ -101,7 +101,7 @@ xlabel('深度(m)');
 ylabel('距离(m)');
 title('单位体积散射强度(dB ref 1uPa)')
 
-xlim([depth_range(1) depth_range(end)]);
+xlim([depth_range(1) depth_range(end-20)]);
 ylim([distance(1) distance(end)]);
 
 

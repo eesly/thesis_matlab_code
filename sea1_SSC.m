@@ -41,7 +41,7 @@ NL = NSL + 10*log10(W) - DI;
 NL
 
 %rw
-T = 27.5;       %温度
+T = 20;       %温度
 S = 35;         %盐度35ppt
 Z = 0;          %深度0km
 PH = 8;
@@ -79,7 +79,7 @@ band = 90e3;
 frange = [fc-band/2 fc fc+band/2];
 
 density = 2650;     %kg/m^3;
-as = 60e-6
+as = 50e-6
 % SSC = 10.^(Sv/10)*100e5/2;
 SSC = (10.^(Sv./10))*3*density*ADCPpara.soundspeed.^4 /(as).^3/frange(2).^4/1.082/4/pi^3;
 
@@ -100,7 +100,7 @@ contourf(X,Y,SSC,'LevelStep',0.1,'LineStyle','-');
 %     'DisplayName','EI_effect');
 hold on;
 colorbar;
-caxis([0 2]);
+caxis([0 1.2]);
 view([90 90]);
 
 % plot(-depth_m,distance,'+black','linewidth',3);hold on;
